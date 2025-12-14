@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 // server.js
 // Propósito: Servidor Express que expone APIs REST y sirve estáticos de `public/`.
 // Relación: Rutea a `routes/products.js` y `routes/orders.js` y da servicio a `public/index.html`.
@@ -9,8 +10,14 @@ const dotenv = require('dotenv');
 const bcrypt = require('bcrypt');
 const { getPool } = require('./db');
 
-// Cargar variables desde .env en la raíz del proyecto (C:\Ecommerce-Lab\.env)
-dotenv.config({ path: path.join(__dirname, '..', '.env') });
+// Detectar si se ejecuta desde un ejecutable pkg (cuando process.pkg existe)
+// Si es ejecutable, __dirname apunta a donde está el ejecutable
+// Si es desarrollo, __dirname apunta a backend/
+const isPkg = typeof process.pkg !== 'undefined';
+const projectRoot = isPkg ? path.dirname(process.execPath) : path.join(__dirname, '..');
+
+// Cargar variables desde .env en la raíz del proyecto
+dotenv.config({ path: path.join(projectRoot, '.env') });
 
 const app = express();
 
@@ -63,13 +70,30 @@ app.use('/api/admin', adminRouter);
 })();
 
 // Servir archivos estáticos (frontend)
-const publicDir = path.join(__dirname, '..', 'public');
-app.use(express.static(publicDir));
+// En ejecutable pkg: primero buscar en el directorio del ejecutable, luego usar __dirname (assets empaquetados)
+// En desarrollo: usar la ruta relativa normal
+const publicDirDev = path.join(__dirname, '..', 'public');
+const publicDirPkg = path.join(projectRoot, 'public');
 
-// Fallback a index.html
-app.get('*', (_req, res) => {
-  res.sendFile(path.join(publicDir, 'index.html'));
-});
+if (isPkg) {
+  // Si es ejecutable, buscar primero en el directorio del ejecutable (para permitir actualizaciones)
+  // Luego usar __dirname como fallback (assets empaquetados)
+  const fs = require('fs');
+  const publicDir = fs.existsSync(publicDirPkg) ? publicDirPkg : publicDirDev;
+  app.use(express.static(publicDir));
+  app.get('*', (_req, res) => {
+    const indexPath = fs.existsSync(path.join(publicDirPkg, 'index.html')) 
+      ? path.join(publicDirPkg, 'index.html')
+      : path.join(publicDirDev, 'index.html');
+    res.sendFile(indexPath);
+  });
+} else {
+  // Desarrollo normal
+  app.use(express.static(publicDirDev));
+  app.get('*', (_req, res) => {
+    res.sendFile(path.join(publicDirDev, 'index.html'));
+  });
+}
 
 const PORT = Number(process.env.PORT || 3000);
 app.listen(PORT, () => {

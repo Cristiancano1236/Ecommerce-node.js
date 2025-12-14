@@ -44,6 +44,11 @@ build/
 *.min.js
 *.min.css
 
+# Ejecutables generados por pkg
+backend/dist/
+*.exe
+ecommerce-lab-backend*
+
 # Archivos de base de datos locales
 *.sqlite
 *.sqlite3

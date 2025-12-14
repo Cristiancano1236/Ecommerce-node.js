@@ -127,6 +127,76 @@ npm run dev
 
 El servidor estará disponible en `http://localhost:3000`
 
+## 🏗️ Generar Ejecutable
+
+El proyecto puede compilarse en un ejecutable usando `pkg`, lo que permite ejecutar la aplicación sin necesidad de instalar Node.js en el sistema destino.
+
+### 1. Instalar dependencias (si aún no lo has hecho)
+
+```bash
+cd backend
+npm install
+```
+
+### 2. Generar ejecutable
+
+**Para todas las plataformas (Windows, Linux, macOS):**
+```bash
+npm run build
+```
+
+**Para una plataforma específica:**
+```bash
+# Solo Windows
+npm run build:win
+
+# Solo Linux
+npm run build:linux
+
+# Solo macOS
+npm run build:mac
+```
+
+Los ejecutables se generarán en `backend/dist/` con los siguientes nombres:
+- Windows: `ecommerce-lab-backend.exe`
+- Linux: `ecommerce-lab-backend`
+- macOS: `ecommerce-lab-backend`
+
+### 3. Preparar la distribución
+
+Después del build, se copiarán automáticamente los archivos de `public/` a `backend/dist/public/`.
+
+**Estructura de distribución:**
+```
+backend/dist/
+├── ecommerce-lab-backend.exe  (o sin .exe en Linux/Mac)
+├── public/
+│   ├── index.html
+│   ├── admin.html
+│   └── js/
+│       ├── app.js
+│       └── admin.js
+```
+
+### 4. Ejecutar el ejecutable
+
+**En Windows:**
+```bash
+cd backend/dist
+ecommerce-lab-backend.exe
+```
+
+**En Linux/macOS:**
+```bash
+cd backend/dist
+./ecommerce-lab-backend
+```
+
+**⚠️ Importante:**
+- El archivo `.env` debe estar en el mismo directorio que el ejecutable o en la raíz del proyecto.
+- Asegúrate de tener MySQL configurado y accesible desde donde ejecutes el ejecutable.
+- La carpeta `public/` debe estar en el mismo directorio que el ejecutable para servir los archivos estáticos.
+
 ## 📚 API Endpoints
 
 ### Autenticación (`/api/auth`)

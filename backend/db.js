@@ -6,8 +6,12 @@ const mysql = require('mysql2/promise');
 const dotenv = require('dotenv');
 const path = require('path');
 
-// Cargar variables desde .env en la raíz del proyecto (C:\Ecommerce-Lab\.env)
-dotenv.config({ path: path.join(__dirname, '..', '.env') });
+// Detectar si se ejecuta desde un ejecutable pkg
+const isPkg = typeof process.pkg !== 'undefined';
+const projectRoot = isPkg ? path.dirname(process.execPath) : path.join(__dirname, '..');
+
+// Cargar variables desde .env en la raíz del proyecto
+dotenv.config({ path: path.join(projectRoot, '.env') });
 
 let pool;
 
